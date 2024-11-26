@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include/
-LDFLAGS = -L/opt/homebrew/lib -lcmocka
+LDFLAGS = -L/opt/homebrew/lib -lcmocka -lpthread
 
 # Automatically detect source files and corresponding object files
 SRC = $(wildcard src/*.c)
