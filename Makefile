@@ -1,57 +1,51 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include/
-LDFLAGS = -L/opt/homebrew/lib -lcmocka -lpthread
+LDFLAGS = -L/opt/homebrew/lib -lpthread
 
-# Automatically detect source files and corresponding object files
-SRC = $(wildcard src/*.c)
-OBJ = $(patsubst src/%.c, target/lib/%.o, $(SRC))
+# Source files for binaries
+BINS = phil
+SRC_phil = $(wildcard src/philosophers/*.c)
 
-# Same for tests
-TEST_SRC = $(wildcard tests/*.c)
-TEST_OBJ = $(patsubst tests/%.c, target/lib/%.o, $(TEST_SRC))
-TEST_SRC_OBJ = $(filter-out target/lib/main.o, $(OBJ))
+# Object files for each binary
+OBJ_phil = $(patsubst src/philosophers/%.c, target/lib/philosophers/%.o, $(SRC_phil))
 
 # Target directories
 TARGET_DIR = target/bin
 LIB_DIR = target/lib
-TARGET = $(TARGET_DIR)/my_project
-TEST_TARGET = $(TARGET_DIR)/run_tests
+
+# Binaries' targets
+TARGETS = $(addprefix $(TARGET_DIR)/, $(BINS))
 
 # Default target
-all: $(TARGET)
-	
+all: $(TARGETS)
+
 compile_commands:
 	bear -- make
 
-# Create target from object files
-$(TARGET): $(OBJ)
+# Build rules for each binary
+$(TARGET_DIR)/phil: $(OBJ_phil)
 	@mkdir -p $(TARGET_DIR)
-	$(CC) $(OBJ) $(LDFLAGS) -o $(TARGET)
-
-$(TEST_TARGET): $(TEST_OBJ) $(TEST_SRC_OBJ)
-	@mkdir -p $(TARGET_DIR)
-
-	$(CC) $(TEST_OBJ) $(TEST_SRC_OBJ) $(LDFLAGS) -o $(TEST_TARGET)
+	$(CC) $(OBJ_phil) $(LDFLAGS) -o $@
 
 # Compile source files into object files
-target/lib/%.o: src/%.c | $(LIB_DIR)
+target/lib/philosophers/%.o: src/philosophers/%.c | $(LIB_DIR)/philosophers
 	$(CC) $(CFLAGS) -c $< -o $@
-
-target/lib/%.o: tests/%.c | $(LIB_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Ensure the lib directory exists
-$(LIB_DIR):
-	@mkdir -p $(LIB_DIR)
-
+	
+# Ensure the lib subdirectories exist
+$(LIB_DIR)/philosophers:
+	@mkdir -p $(LIB_DIR)/philosophers
+	
 # Clean up build artifacts
 clean:
 	rm -rf target
 
-# Run the executable
-run: $(TARGET)
-	@./$(TARGET)
-
-test: $(TEST_TARGET)
-	@./$(TEST_TARGET)
+# Run a specific binary (e.g., make run BIN=phil)
+run:
+ifeq ($(BIN),)
+	@echo "Available binaries:"
+	@echo $(BINS) | tr ' ' '\n'
+	@echo "Usage: make run BIN=<binary_name> ARGS=\"<arguments>\""
+else
+	@./$(TARGET_DIR)/$(BIN) $(ARGS)
+endif
