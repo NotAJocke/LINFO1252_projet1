@@ -18,23 +18,23 @@ void *philosopher(void *raw_args) {
 
   for (int i = 0; i < 1000000; i++) {
     if (right < left) {
-      printf("Phil %d taking the fork %d\n", right, right);
+      // printf("Phil %d taking the fork %d\n", right, right);
       pthread_mutex_lock(&args->forks[right]);
 
-      printf("Phil %d taking the fork %d\n", right, left);
+      // printf("Phil %d taking the fork %d\n", right, left);
       pthread_mutex_lock(&args->forks[left]);
     } else {
-      printf("Phil %d taking the fork %d\n", right, left);
+      // printf("Phil %d taking the fork %d\n", right, left);
       pthread_mutex_lock(&args->forks[left]);
 
-      printf("Phil %d taking the fork %d\n", right, right);
+      // printf("Phil %d taking the fork %d\n", right, right);
       pthread_mutex_lock(&args->forks[right]);
     }
 
-    printf("Phil %d releasing the fork %d\n", right, right);
+    // printf("Phil %d releasing the fork %d\n", right, right);
     pthread_mutex_unlock(&args->forks[right]);
 
-    printf("Phil %d releasing the fork %d\n", right, left);
+    // printf("Phil %d releasing the fork %d\n", right, left);
     pthread_mutex_unlock(&args->forks[left]);
   }
 
