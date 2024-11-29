@@ -4,11 +4,13 @@ CFLAGS = -Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include/
 LDFLAGS = -L/opt/homebrew/lib -lpthread
 
 # Source files for binaries
-BINS = phil
+BINS = phil rw
 SRC_phil = $(wildcard src/philosophers/*.c)
+SRC_rw = $(wildcard src/reads-writes/*.c)
 
 # Object files for each binary
 OBJ_phil = $(patsubst src/philosophers/%.c, target/lib/philosophers/%.o, $(SRC_phil))
+OBJ_rw = $(patsubst src/reads-writes/%.c, target/lib/reads-writes/%.o, $(SRC_rw))
 
 # Target directories
 TARGET_DIR = target/bin
@@ -28,14 +30,24 @@ $(TARGET_DIR)/phil: $(OBJ_phil)
 	@mkdir -p $(TARGET_DIR)
 	$(CC) $(OBJ_phil) $(LDFLAGS) -o $@
 
+$(TARGET_DIR)/rw: $(OBJ_rw)
+	@mkdir -p $(TARGET_DIR)
+	$(CC) $(OBJ_rw) $(LDFLAGS) -o $@
+
 # Compile source files into object files
 target/lib/philosophers/%.o: src/philosophers/%.c | $(LIB_DIR)/philosophers
 	$(CC) $(CFLAGS) -c $< -o $@
-	
+
+target/lib/reads-writes/%.o: src/reads-writes/%.c | $(LIB_DIR)/reads-writes
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Ensure the lib subdirectories exist
 $(LIB_DIR)/philosophers:
 	@mkdir -p $(LIB_DIR)/philosophers
-	
+
+$(LIB_DIR)/reads-writes:
+	@mkdir -p $(LIB_DIR)/reads-writes
+
 # Clean up build artifacts
 clean:
 	rm -rf target
