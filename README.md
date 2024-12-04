@@ -1,21 +1,14 @@
-# Template for C projects
+# LINFO1252 - Project 1
 
-## Get started
-- Clone the repo
-- Run `make compile_commands` to generate compile_commands.json (See [LSP](#lsp))
-- Run `make` to compile the project
-
-## Commands
-```bash
-make # compiles the project
-make run # runs the executable
-make clean # cleans the project
-make compile_commands # updates the compile_commands.json file
+## Compilation
+```sh
+$ make # Compile avec le mutex test_and_test_and_set
+$ make MUTEX_IMPL="tts" # Pareil 
+$ make MUTEX_IMPL="ts" # Avec le mutex test_and_set
 ```
 
-## LSP
-If you use clangd lsp, you must install the [bear cli](https://github.com/rizsotto/Bear). You'll need to
-run `make compile_commands` when your build process has changed.
-
-The `compile_commands.json` helps the LSP find some files such as the headers.
-
+## Run
+```sh
+$ make run BIN=<"phil"|"rw"|"prod"|"tests"> ARGS="xxxxx"
+$ ./target/bin/<phil|rw|prod|tests> # sinon
+```
