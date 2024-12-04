@@ -19,6 +19,7 @@ else
 	SRC_mutex = src/my_mutex/test_and_set.c
 endif
 
+SRC_mutex += src/my_mutex/semaphore.c
 # Object files for each binary
 OBJ_phil = $(patsubst src/philosophers/%.c, target/lib/philosophers/%.o, $(SRC_phil))
 OBJ_rw = $(patsubst src/reads-writes/%.c, target/lib/reads-writes/%.o, $(SRC_rw))
