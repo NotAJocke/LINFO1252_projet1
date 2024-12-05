@@ -4,7 +4,7 @@ TIMEFORMAT=%R
 
 THREAD_CONFIGS=(2 4 8 16 32)
 REPEATS=5
-OUTPUT_FILE="performance.csv"
+OUTPUT_FILE="src/performance/performance.csv"
 EXECUTABLE_DIR="./target/bin"
 PROGRAMS=("phil" "pro" "rw")
 

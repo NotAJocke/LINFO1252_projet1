@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-df = pd.read_csv(os.path.abspath('performance.csv'))
+df = pd.read_csv(os.path.abspath('src/performance/performance.csv'))
 
 # Fusionner les valeurs pour pas avoir 5x5x3 mais juste 5x3.
 grouped = df.groupby(['Programme', 'Nombre de Threads']).agg(
@@ -24,13 +24,13 @@ index = np.arange(len(thread_counts))
 colors = ['#87A878', '#C7CCB9', '#DBF9B8'] # LE VERT <3
 
 for i, program in enumerate(programs):
-    mean_values = pivoted[program].fillna(0) # Recup valeurs moyenne
-    std_values = std_pivoted[program].fillna(0) # Recup valeurs moyenne
+    mean_values = pivoted[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
+    std_values = std_pivoted[program].fillna(0)
     ax.bar(index + i * bar_width, mean_values, bar_width,
            yerr=std_values, label=program,
            color=colors[i % len(colors)], capsize=5) # Dessiner le graph
 
-# Customize the plot
+# Graph
 ax.set_xlabel('Nombre de Threads') # Label du X
 ax.set_ylabel('Temps d\'exécution (s)') # Label du Y
 ax.set_title('Temps d\'exécution moyen par programme et nombre de threads') # Titre du graph
