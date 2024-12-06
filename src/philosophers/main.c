@@ -3,21 +3,34 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-  if (argc < 2) {
-    printf("Missing number argument\n");
+  if (argc < 3) {
+    printf("Usage: ./phil <N_PHIL> <IMPL>\n");
     return 1;
   }
 
-  char *raw_number = argv[1];
+  char *raw_phils = argv[1];
   char *end;
-  int amount = strtol(raw_number, &end, 10);
+  int amount = strtol(raw_phils, &end, 10);
 
   if (*end != '\0') {
-    printf("Failed to parse number argument\n");
+    printf("Usage: ./phil <N_PHIL> <IMPL>\n");
     return 1;
   }
 
-  run_philosophers(amount);
+  char *raw_impl = argv[2];
+  char *end2;
+  int impl = strtol(raw_impl, &end2, 10);
+
+  if (*end2 != '\0') {
+    printf("Usage: ./phil <N_PHIL> <IMPL>\n");
+    return 1;
+  }
+
+  if (impl == 1) {
+    run_philosophers(amount);
+  } else {
+    run_philosophers_custom(amount);
+  }
 
   return 0;
 }

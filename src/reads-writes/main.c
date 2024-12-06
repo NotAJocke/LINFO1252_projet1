@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-  if (argc < 3) {
-    printf("Not enough arguments: READERS WRITERS\n");
+  if (argc < 4) {
+    printf("Usage: ./phil <READERS> <WRITERS> <IMPl>\n");
   }
 
   char *raw_readers = argv[1];
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   int readers = strtol(raw_readers, &end_readers, 10);
 
   if (*end_readers != '\0') {
-    printf("Failed to parse readers arguments\n");
+    printf("Usage: ./phil <READERS> <WRITERS> <IMPl>\n");
   }
 
   char *raw_writers = argv[2];
@@ -20,8 +20,20 @@ int main(int argc, char **argv) {
   int writers = strtol(raw_writers, &end_writers, 10);
 
   if (*end_writers != '\0') {
-    printf("Failed to parse writers arguments\n");
+    printf("Usage: ./phil <READERS> <WRITERS> <IMPl>\n");
   }
 
-  return run_readers_writers(readers, writers);
+  char *raw_impl = argv[3];
+  char *end_impl;
+  int impl = strtol(raw_impl, &end_impl, 10);
+
+  if (*end_impl != '\0') {
+    printf("Usage: ./phil <READERS> <WRITERS> <IMPl>\n");
+  }
+
+  if (impl == 1) {
+    run_readers_writers(readers, writers);
+  } else {
+    run_readers_writers_custom(readers, writers);
+  }
 }

@@ -3,136 +3,129 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 8
-#define NB_PRODUCTIONS 131072
+#define BUFFER_SIZE_CUSTOM 8
+#define NB_PRODUCTIONS_CUSTOM 131072
 
-int buffer[BUFFER_SIZE];
-int idx_buffer = 0;
-int nbProductionsDone = 0;
-int nbConsumeDone = 0;
+int buffer_custom[BUFFER_SIZE_CUSTOM];
+int idx_buffer_custom = 0;
+int nbProductionsDone_custom = 0;
+int nbConsumeDone_custom = 0;
 
-my_mutex_t mutex;
-my_semaphore_t empty;
-my_semaphore_t full;
+my_mutex_t mutex_custom;
+my_semaphore_t empty_custom;
+my_semaphore_t full_custom;
 
 // Simulation
-void simulation(void) {
-    for (int i = 0; i < 10000; i++);
+void simulation_custom(void) {
+  for (volatile int i = 0; i < 10000; i++)
+    ;
 }
 
-void insert_item(int item) {
-    if (idx_buffer >= BUFFER_SIZE) {
-        printf("Erreur : Segfault (Hors limite)\n");
-        exit(EXIT_FAILURE);
-    }
-    buffer[idx_buffer] = item;
-    idx_buffer++;
+void insert_item_custom(int item) {
+  if (idx_buffer_custom >= BUFFER_SIZE_CUSTOM) {
+    printf("Erreur : Segfault (Hors limite)\n");
+    exit(EXIT_FAILURE);
+  }
+  buffer_custom[idx_buffer_custom] = item;
+  idx_buffer_custom++;
 }
 
-int remove_item() {
-    if (idx_buffer <= 0) {
-        printf("Erreur : Segfault (Vide)\n");
-        exit(EXIT_FAILURE);
-    }
-    idx_buffer--;
-    return buffer[idx_buffer];
+int remove_item_custom() {
+  if (idx_buffer_custom <= 0) {
+    printf("Erreur : Segfault (Vide)\n");
+    exit(EXIT_FAILURE);
+  }
+  idx_buffer_custom--;
+  return buffer_custom[idx_buffer_custom];
 }
 
-void *producer(void *arg) {
-    int id = *(int *)arg;
+void *producer_custom(void *arg) {
+  int id = *(int *)arg;
 
-    while (1) {
-        int item = id;
+  while (1) {
+    int item = id;
 
-        sem_wait(&empty);
-        lock(&mutex);
+    sem_wait(&empty_custom);
+    lock(&mutex_custom);
 
-        if (nbProductionsDone >= NB_PRODUCTIONS) {
-            sem_post(&full);
-            unlock(&mutex);
-            break;
-        }
-
-        insert_item(item);
-        nbProductionsDone++;
-
-        sem_post(&full);
-        unlock(&mutex);
-
-        simulation();
+    if (nbProductionsDone_custom >= NB_PRODUCTIONS_CUSTOM) {
+      sem_post(&full_custom);
+      unlock(&mutex_custom);
+      break;
     }
-    return NULL;
+
+    insert_item_custom(item);
+    nbProductionsDone_custom++;
+
+    sem_post(&full_custom);
+    unlock(&mutex_custom);
+
+    simulation_custom();
+  }
+  return NULL;
 }
 
 // Fonction consommateur
-void *consumer() {
-    while (1) {
-        sem_wait(&full);
-        lock(&mutex);
+void *consumer_custom() {
+  while (1) {
+    sem_wait(&full_custom);
+    lock(&mutex_custom);
 
-        if (nbConsumeDone >= NB_PRODUCTIONS) {
-            sem_post(&empty);
-            unlock(&mutex);
-            break;
-        }
-
-        remove_item();
-        nbConsumeDone++;
-
-        sem_post(&empty);
-        unlock(&mutex);
-
-        simulation();
+    if (nbConsumeDone_custom >= NB_PRODUCTIONS_CUSTOM) {
+      sem_post(&empty_custom);
+      unlock(&mutex_custom);
+      break;
     }
-    return NULL;
+
+    remove_item_custom();
+    nbConsumeDone_custom++;
+
+    sem_post(&empty_custom);
+    unlock(&mutex_custom);
+
+    simulation_custom();
+  }
+  return NULL;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        printf("Usage: %s <num_producers> <num_consumers>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
+int run_producer_custom(int nbProducers, int nbConsumers) {
+  if (nbProducers < 1 || nbConsumers < 1) {
+    printf("Erreur : au moins 1 producteur et 1 consommateur sont requis.\n");
+    return EXIT_FAILURE;
+  }
 
-    int nbProducers = atoi(argv[1]);
-    int nbConsumers = atoi(argv[2]);
+  pthread_t producers[nbProducers];
+  pthread_t consumers[nbConsumers];
+  int producer_ids[nbProducers];
 
-    if (nbProducers < 1 || nbConsumers < 1) {
-        printf("Erreur : au moins 1 producteur et 1 consommateur sont requis.\n");
-        return EXIT_FAILURE;
-    }
+  my_mutex_init(&mutex_custom);
+  sem_init(&empty_custom, BUFFER_SIZE_CUSTOM);
+  sem_init(&full_custom, 0);
 
-    pthread_t producers[nbProducers];
-    pthread_t consumers[nbConsumers];
-    int producer_ids[nbProducers];
+  // Création des threads producteurs
+  for (int i = 0; i < nbProducers; i++) {
+    producer_ids[i] = i + 1;
+    pthread_create(&producers[i], NULL, producer_custom, &producer_ids[i]);
+  }
 
-    my_mutex_init(&mutex);
-    sem_init(&empty, BUFFER_SIZE);
-    sem_init(&full, 0);
+  // Création des threads consommateurs
+  for (int i = 0; i < nbConsumers; i++) {
+    pthread_create(&consumers[i], NULL, consumer_custom, NULL);
+  }
 
-    // Création des threads producteurs
-    for (int i = 0; i < nbProducers; i++) {
-        producer_ids[i] = i + 1;
-        pthread_create(&producers[i], NULL, producer, &producer_ids[i]);
-    }
+  // Attente de la fin des producteurs
+  for (int i = 0; i < nbProducers; i++) {
+    pthread_join(producers[i], NULL);
+  }
 
-    // Création des threads consommateurs
-    for (int i = 0; i < nbConsumers; i++) {
-        pthread_create(&consumers[i], NULL, consumer, NULL);
-    }
+  // Attente de la fin des consommateurs
+  for (int i = 0; i < nbConsumers; i++) {
+    pthread_join(consumers[i], NULL);
+  }
 
-    // Attente de la fin des producteurs
-    for (int i = 0; i < nbProducers; i++) {
-        pthread_join(producers[i], NULL);
-    }
-
-    // Attente de la fin des consommateurs
-    for (int i = 0; i < nbConsumers; i++) {
-        pthread_join(consumers[i], NULL);
-    }
-
-    // Détruire les sémaphores
-    // pthread_mutex_destroy(&mutex);
-    sem_destroy(&empty);
-    sem_destroy(&full);
-    return EXIT_SUCCESS;
+  // Détruire les sémaphores
+  // pthread_mutex_destroy(&mutex);
+  sem_destroy(&empty_custom);
+  sem_destroy(&full_custom);
+  return EXIT_SUCCESS;
 }
