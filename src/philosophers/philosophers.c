@@ -54,7 +54,7 @@ int run_philosophers(int amount) {
   for (int i = 0; i < amount; i++) {
     int err = pthread_mutex_init(&forks[i], NULL);
     if (err != 0) {
-      printf("Fatal: couldn't create mutex %d\n", i);
+      printf("Fatal: couldn't create mutex_test_and_set %d\n", i);
       return 1;
     }
   }

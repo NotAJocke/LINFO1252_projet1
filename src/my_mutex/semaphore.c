@@ -11,7 +11,7 @@ void sem_wait(my_semaphore_t *sem) {
 
   while (sem->count <= 0) {
     unlock(&sem->mutex);
-    printf("Waiting, current count: %d\n", sem->count);
+    // printf("Waiting, current count: %d\n", sem->count);
     asm("pause");
     lock(&sem->mutex);
   }

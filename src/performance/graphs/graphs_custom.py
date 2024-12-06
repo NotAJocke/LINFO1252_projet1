@@ -56,4 +56,4 @@ ax.set_xticklabels(thread_counts) # Bons nombre de thread afficher
 ax.set_ylim(0, max(pivoted1.max().max(), pivoted2.max().max()) + 0.5)
 ax.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig('custom.png')

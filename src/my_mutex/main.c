@@ -8,9 +8,9 @@
 my_mutex_t mutex;
 
 void *fake_worker(void *arg) {
-  (void)arg;
+  int n_threads = *(int *)arg;
 
-  for (int i = 0; i < CRITICAL_SECTIONS; i++) {
+  for (int i = 0; i < CRITICAL_SECTIONS/n_threads; i++) {
     lock(&mutex);
 
     for (int i = 0; i < 10000; i++)
@@ -24,7 +24,7 @@ void *fake_worker(void *arg) {
 
 int main(int argc, char **argv) {
   if (argc < 2) {
-    printf("Usage: ./mutex <NTHREADS>\n");
+    printf("Usage: ./mutex_test_and_set <NTHREADS>\n");
     return 1;
   }
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   int nthreads = strtol(argv[1], &end, 10);
 
   if (*end != '\0') {
-    printf("Usage: ./mutex <NTHREADS>\n");
+    printf("Usage: ./mutex_test_and_set <NTHREADS>\n");
     return 1;
   }
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   pthread_t threads[nthreads];
 
   for (int i = 0; i < nthreads; i++) {
-    pthread_create(&threads[i], NULL, fake_worker, NULL);
+    pthread_create(&threads[i], NULL, fake_worker, &nthreads);
   }
 
   for (int i = 0; i < nthreads; i++) {

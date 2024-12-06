@@ -3,6 +3,7 @@
 #include "semaphore.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 sem_t rmutex;
 sem_t wmutex;

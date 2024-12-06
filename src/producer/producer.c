@@ -128,8 +128,6 @@ int run_producer(int nbProducers, int nbConsumers) {
   sem_destroy(empty);
   sem_destroy(full);
 
-  // printf("FINI.\n");
-  fflush(stdout);
-
   return EXIT_SUCCESS;
 }
+
