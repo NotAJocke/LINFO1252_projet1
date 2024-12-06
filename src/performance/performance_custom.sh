@@ -4,7 +4,7 @@ TIMEFORMAT=%R
 THREAD_CONFIGS=(2 4 8 16 32)
 REPEATS=5
 EXECUTABLE_DIR="./target/bin"
-PROGRAMS=("phil" "prod" "rw")
+PROGRAMS=("phil" "pro" "rw")
 
 for MUTEX_IMPL in "tts" "ts" "partie 1"; do
   if [ "$MUTEX_IMPL" == "tts" ]; then
