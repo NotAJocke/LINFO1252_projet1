@@ -47,7 +47,6 @@ void *producer(void *arg) {
   int id = *(int *)arg;
 
   while (1) {
-    printf("entering producer\n");
     int item = id;
 
     sem_wait(&empty);
@@ -73,7 +72,6 @@ void *producer(void *arg) {
 // Fonction consommateur
 void *consumer() {
   while (1) {
-    printf("entering consummer\n");
     sem_wait(&full);
     pthread_mutex_lock(&mutex);
 
@@ -130,4 +128,26 @@ int run_producer(int nbProducers, int nbConsumers) {
   sem_destroy(&full);
 
   return EXIT_SUCCESS;
+}
+
+int main(int argc, char **argv) {
+  if (argc < 2) {
+    printf("Usage: ./prod <PRODUCERS+CONSUMERS>\n");
+    return 1;
+  }
+
+  char *raw = argv[1];
+  char *end;
+  int amount = strtol(raw, &end, 10);
+
+  if (*end != '\0') {
+    printf("Usage: ./prod <PRODUCERS+CONSUMERS>\n");
+    return 1;
+  }
+
+  int producers = amount / 2;
+  int consumers = amount / 2;
+
+  run_producer(producers, consumers);
+  return 0;
 }

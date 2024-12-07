@@ -89,3 +89,23 @@ int run_philosophers(int amount) {
 
   return 0;
 }
+
+int main(int argc, char **argv) {
+  if (argc < 2) {
+    printf("Usage: ./phil <N_PHIL>\n");
+    return 1;
+  }
+
+  char *raw_phils = argv[1];
+  char *end;
+  int amount = strtol(raw_phils, &end, 10);
+
+  if (*end != '\0') {
+    printf("Usage: ./phil <N_PHIL>\n");
+    return 1;
+  }
+
+  run_philosophers(amount);
+
+  return 0;
+}

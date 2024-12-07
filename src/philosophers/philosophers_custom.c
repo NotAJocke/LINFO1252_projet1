@@ -9,10 +9,10 @@ typedef struct {
   int id;
   my_mutex_t *forks;
   int philosophers_amount;
-} phil_args_custom_t;
+} phil_args_t;
 
-void *philosopher_custom(void *raw_args) {
-  phil_args_custom_t *args = (phil_args_custom_t *)raw_args;
+void *philosopher(void *raw_args) {
+  phil_args_t *args = (phil_args_t *)raw_args;
 
   int right = args->id;
   int left = (right + 1) % args->philosophers_amount;
@@ -42,10 +42,10 @@ void *philosopher_custom(void *raw_args) {
   pthread_exit(NULL);
 }
 
-int run_philosophers_custom(int amount) {
+int run_philosophers(int amount) {
   pthread_t philosophers[amount];
   my_mutex_t forks[amount];
-  phil_args_custom_t *args = malloc(amount * sizeof(phil_args_custom_t));
+  phil_args_t *args = malloc(amount * sizeof(phil_args_t));
   if (args == NULL) {
     printf("Fatal: couldn't malloc the philosophers args\n");
     return 1;
@@ -58,18 +58,48 @@ int run_philosophers_custom(int amount) {
 
   // Init the threads
   for (int i = 0; i < amount; i++) {
-    args[i] = (phil_args_custom_t){
-        .forks = forks, .philosophers_amount = amount, .id = i};
+    args[i] =
+        (phil_args_t){.forks = forks, .philosophers_amount = amount, .id = i};
 
-    pthread_create(&philosophers[i], NULL, philosopher_custom,
-                   (void *)&args[i]);
+    int err =
+        pthread_create(&philosophers[i], NULL, philosopher, (void *)&args[i]);
+
+    if (err != 0) {
+      printf("Fatal: couldn't create thread %d\n", i);
+      return 1;
+    }
   }
 
   for (int i = 0; i < amount; i++) {
-    pthread_join(philosophers[i], NULL);
+    int err = pthread_join(philosophers[i], NULL);
+    if (err != 0) {
+      printf("Fatal: couldn't join thread %d\n", i);
+      return 1;
+    }
   }
 
   free(args);
+
+  return 0;
+}
+
+int main(int argc, char **argv) {
+  printf("Running the custom one\n");
+  if (argc < 2) {
+    printf("Usage: ./phil <N_PHIL>\n");
+    return 1;
+  }
+
+  char *raw_phils = argv[1];
+  char *end;
+  int amount = strtol(raw_phils, &end, 10);
+
+  if (*end != '\0') {
+    printf("Usage: ./phil <N_PHIL>\n");
+    return 1;
+  }
+
+  run_philosophers(amount);
 
   return 0;
 }
