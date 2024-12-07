@@ -29,9 +29,9 @@ for PROGRAM in "${PROGRAMS[@]}"; do
       DURATION=""
 
       if [[ "$PROGRAM" == "phil" ]]; then
-        DURATION=$({ time $EXECUTABLE_DIR/$PROGRAM $THREADS 2>>/dev/null; } 2>&1)
+        DURATION=$({ time make run BIN="$PROGRAM" ARGS="$THREADS 1"  2>>/dev/null; } 2>&1)
       else
-        DURATION=$({ time $EXECUTABLE_DIR/$PROGRAM $NB_PRODUCERS $NB_CONSUMERS 2>>/dev/null; } 2>&1)
+          DURATION=$({ time make run BIN="$PROGRAM" ARGS="$NB_PRODUCERS $NB_CONSUMERS 1" 2>>/dev/null; } 2>&1)
       fi
 
       echo "$PROGRAM,$THREADS,$RUN,$DURATION" >>$OUTPUT_FILE

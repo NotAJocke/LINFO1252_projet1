@@ -40,12 +40,16 @@ for i, program in enumerate(pivoted1.columns):
            yerr=std_values1, label=f'{program} (tts)',
            color=colors[i % len(colors)], capsize=5)
 
+    ax.plot(index + i * bar_width, mean_values1, color=colors[i % len(colors)], marker='.', linestyle='dotted')
+
 for i, program in enumerate(pivoted2.columns):
     mean_values2 = pivoted2[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
     std_values2 = std_pivoted2[program].fillna(0)
     ax.bar(index + (len(pivoted1.columns) + i) * bar_width, mean_values2, bar_width,
            yerr=std_values2, label=f'{program} (ts)',
            color=colors[(i + len(pivoted1.columns)) % len(colors)], capsize=5)
+
+    ax.plot(index + (len(pivoted1.columns) + i) * bar_width, mean_values2, color=colors[(i + len(pivoted1.columns)) % len(colors)], marker='.', linestyle='dotted')
 
 # Graph
 ax.set_xlabel('Nombre de Threads') # Label du X
@@ -56,5 +60,4 @@ ax.set_xticklabels(thread_counts) # Bons nombre de thread afficher
 ax.set_ylim(0, max(pivoted1.max().max(), pivoted2.max().max()) + 0.5)
 ax.legend()
 plt.tight_layout()
-plt.show()
 plt.savefig('mutex.png')
