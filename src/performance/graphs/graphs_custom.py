@@ -23,7 +23,7 @@ grouped = df.groupby(['Programme', 'Mutex', 'Nombre de Threads']).agg(
 # Unique program types
 program_types = grouped['Programme'].unique()
 mutex_types = ['tts', 'ts', 'p1']
-colors = ['#87A878', '#C7CCB9', '#A3A1D1']  # Colors for mutex types
+colors = ['#87A878', '#CA3C25', '#A3A1D1']  # Colors for mutex types
 
 # Iterate through each program type to generate a separate graph
 for program in program_types:
@@ -61,7 +61,7 @@ for program in program_types:
 
     # Save to PNG
     plt.tight_layout()
-    plt.savefig(f'{program}_performance_custom.png')
+    plt.savefig(f'img/{program}_performance_custom.png')
 
 print("Graphs saved successfully.")
 

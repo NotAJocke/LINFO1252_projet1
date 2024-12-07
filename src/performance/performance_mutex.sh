@@ -20,7 +20,7 @@ for MUTEX_IMPL in "tts" "ts"; do
 
   # suppr les fichier et reconstruire
   make clean
-  make MUTEX_IMPL=$MUTEX_IMPL
+  make $MUTEX_IMPL
 
   # Tester chaque type 1 par 1 (il y en a qu'un pour l'instant)
   for PROGRAM in "${PROGRAMS[@]}"; do
@@ -30,7 +30,7 @@ for MUTEX_IMPL in "tts" "ts"; do
 
       for RUN in $(seq 1 $REPEATS); do
         DURATION=""
-        DURATION=$({ time make run BIN="mutex" ARGS="$THREADS" 2>>/dev/null; } 2>&1)
+        DURATION=$({ time $EXECUTABLE_DIR/$PROGRAM $THREADS 2>>/dev/null; } 2>&1)
 
         echo "$PROGRAM,$THREADS,$RUN,$DURATION" >>$OUTPUT_FILE
         echo "    Execution $RUN finie en $DURATION ms."

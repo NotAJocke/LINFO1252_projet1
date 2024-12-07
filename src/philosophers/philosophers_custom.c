@@ -84,7 +84,6 @@ int run_philosophers(int amount) {
 }
 
 int main(int argc, char **argv) {
-  printf("Running the custom one\n");
   if (argc < 2) {
     printf("Usage: ./phil <N_PHIL>\n");
     return 1;

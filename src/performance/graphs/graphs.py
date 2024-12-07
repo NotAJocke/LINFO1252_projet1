@@ -14,7 +14,7 @@ grouped = df.groupby(['Programme', 'Nombre de Threads']).agg(
 
 # Unique program types
 program_types = grouped['Programme'].unique()
-color = '#87A878'  # Single color for the bar
+color = '#A3A1D1'  # Single color for the bar
 
 # Iterate through each program type to generate a separate graph
 for program in program_types:
@@ -50,7 +50,7 @@ for program in program_types:
 
     # Save to PNG
     plt.tight_layout()
-    plt.savefig(f'{program}_performance.png')
+    plt.savefig(f'img/{program}_performance.png')
     plt.close()
 
 print("Graphs saved successfully.")

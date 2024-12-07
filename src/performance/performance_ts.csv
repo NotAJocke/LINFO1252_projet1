@@ -1,0 +1,26 @@
+Programme,Nombre de Threads,Tentative N°,Temps d'execution
+mutex,2,1,0.370
+mutex,2,2,0.369
+mutex,2,3,0.367
+mutex,2,4,0.371
+mutex,2,5,0.369
+mutex,4,1,0.374
+mutex,4,2,0.376
+mutex,4,3,0.381
+mutex,4,4,0.378
+mutex,4,5,0.376
+mutex,8,1,0.383
+mutex,8,2,0.376
+mutex,8,3,0.394
+mutex,8,4,0.376
+mutex,8,5,0.388
+mutex,16,1,0.391
+mutex,16,2,0.391
+mutex,16,3,0.393
+mutex,16,4,0.392
+mutex,16,5,0.390
+mutex,32,1,0.404
+mutex,32,2,0.736
+mutex,32,3,0.689
+mutex,32,4,0.555
+mutex,32,5,0.583

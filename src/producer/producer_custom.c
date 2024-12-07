@@ -130,8 +130,6 @@ int run_producer(int nbProducers, int nbConsumers) {
 }
 
 int main(int argc, char **argv) {
-  printf("Running the custom one\n");
-
   if (argc < 2) {
     printf("Usage: ./prod <PRODUCERS+CONSUMERS>\n");
     return 1;

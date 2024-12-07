@@ -30,7 +30,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 bar_width = 0.1
 index = np.arange(len(thread_counts))
 
-colors = ['#87A878', '#C7CCB9']  # VERT :3
+colors = ['#87A878', '#CA3C25']  # VERT :3
 
 # tts & ts (fait de sorte à avoir les 3 autres programmes)
 for i, program in enumerate(pivoted1.columns):
@@ -60,4 +60,4 @@ ax.set_xticklabels(thread_counts) # Bons nombre de thread afficher
 ax.set_ylim(0, max(pivoted1.max().max(), pivoted2.max().max()) + 0.5)
 ax.legend()
 plt.tight_layout()
-plt.savefig('mutex.png')
+plt.savefig('img/mutex.png')
