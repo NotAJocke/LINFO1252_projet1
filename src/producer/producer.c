@@ -1,9 +1,8 @@
 #include <pthread.h>
+#include <semaphore.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <semaphore.h>
-#include "portable_semaphore.h"
-#include <stdint.h>
 
 #define BUFFER_SIZE 8
 #define NB_PRODUCTIONS 131072
@@ -14,8 +13,8 @@ int nbProductionsDone = 0;
 int nbConsumeDone = 0;
 
 pthread_mutex_t mutex;
-sem_t *empty;
-sem_t *full;
+sem_t empty;
+sem_t full;
 // Simulation
 void simulation(void) {
   for (volatile int i = 0; i < 10000; i++)
@@ -48,13 +47,14 @@ void *producer(void *arg) {
   int id = *(int *)arg;
 
   while (1) {
+    printf("entering producer\n");
     int item = id;
 
-    sem_wait(empty);
+    sem_wait(&empty);
     pthread_mutex_lock(&mutex);
 
     if (nbProductionsDone >= NB_PRODUCTIONS) {
-      sem_post(full);
+      sem_post(&full);
       pthread_mutex_unlock(&mutex);
       break;
     }
@@ -62,7 +62,7 @@ void *producer(void *arg) {
     insert_item(item);
     nbProductionsDone++;
 
-    sem_post(full);
+    sem_post(&full);
     pthread_mutex_unlock(&mutex);
 
     simulation();
@@ -73,11 +73,12 @@ void *producer(void *arg) {
 // Fonction consommateur
 void *consumer() {
   while (1) {
-    sem_wait(full);
+    printf("entering consummer\n");
+    sem_wait(&full);
     pthread_mutex_lock(&mutex);
 
     if (nbConsumeDone >= NB_PRODUCTIONS) {
-      sem_post(empty);
+      sem_post(&empty);
       pthread_mutex_unlock(&mutex);
       break;
     }
@@ -85,7 +86,7 @@ void *consumer() {
     remove_item();
     nbConsumeDone++;
 
-    sem_post(empty);
+    sem_post(&empty);
     pthread_mutex_unlock(&mutex);
 
     simulation();
@@ -104,8 +105,8 @@ int run_producer(int nbProducers, int nbConsumers) {
   int producer_ids[nbProducers];
 
   pthread_mutex_init(&mutex, NULL);
-  empty = sem_init(BUFFER_SIZE);
-  full = sem_init(0);
+  sem_init(&empty, 0, BUFFER_SIZE);
+  sem_init(&full, 0, 0);
 
   for (int i = 0; i < nbProducers; i++) {
     producer_ids[i] = i + 1;
@@ -125,11 +126,8 @@ int run_producer(int nbProducers, int nbConsumers) {
   }
 
   pthread_mutex_destroy(&mutex);
-  sem_destroy(empty);
-  sem_destroy(full);
-
-  // printf("FINI.\n");
-  fflush(stdout);
+  sem_destroy(&empty);
+  sem_destroy(&full);
 
   return EXIT_SUCCESS;
 }
