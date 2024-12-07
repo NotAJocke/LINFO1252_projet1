@@ -1,0 +1,35 @@
+# Compiler, compilations flags, linking flags
+CC=gcc
+CFLAGS=-Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include
+LDFLAGS=-L/opt/homebrew/lib -lpthread
+
+# Binaries
+BINS = phil
+BINS_DIR = target/bin
+TARGETS = $(addprefix $(BINS_DIR)/, $(BINS))
+
+# Libs
+LIB_DIR = target/lib
+LIB_DIRS = $(LIB_DIR)/philosophers
+
+# Sources
+SRC_phil = src/philosophers/philosophers.c
+
+# Objects
+OBJS_phil = target/lib/philosophers/philosophers_libc.o
+
+all: $(TARGETS)
+
+$(BINS_DIR)/phil:  $(OBJS_phil) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_phil) -o $@
+
+target/lib/philosophers/%.o: $(SRC_phil) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BINS_DIR):
+	@mkdir -p $(BINS_DIR)
+
+$(LIB_DIRS):
+	@mkdir -p $@
+
+.PHONY = all
