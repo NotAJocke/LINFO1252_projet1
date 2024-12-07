@@ -1,0 +1,79 @@
+# Compiler, compilations flags, linking flags
+CC=gcc
+CFLAGS=-Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include
+LDFLAGS=-L/opt/homebrew/lib -lpthread
+
+# Binaries
+BINS = phil rw prod mutex
+BINS_DIR = target/bin
+TARGETS = $(addprefix $(BINS_DIR)/, $(BINS))
+
+# Libs
+LIB_DIR = target/lib
+LIB_DIRS = $(LIB_DIR)/philosophers $(LIB_DIR)/my_mutex $(LIB_DIR)/readers-writers $(LIB_DIR)/producer
+
+# Sources
+SRC_phil = src/philosophers/philosophers_custom.c
+SRC_rw = src/reads-writes/readers-writers_custom.c
+SRC_prod = src/producer/producer_custom.c
+SRC_mutexbin = src/my_mutex/main.c
+
+# Mutex impl
+MUTEX?=ts
+ifeq ($(MUTEX), ts)
+	SRC_mutex = src/my_mutex/semaphore.c src/my_mutex/test_and_set.c
+
+	OBJS_phil = target/lib/philosophers/philosophers_ts.o
+	OBJS_rw = target/lib/readers-writers/readers-writers_ts.o
+	OBJS_prod = target/lib/producer/producer_ts.o
+	OBJS_mutexbin = target/lib/my_mutex/mutex_ts.o
+
+else
+	SRC_mutex = src/my_mutex/semaphore.c src/my_mutex/test_and_test_and_set.c
+
+	OBJS_phil = target/lib/philosophers/philosophers_tts.o
+	OBJS_rw = target/lib/readers-writers/readers-writers_tts.o
+	OBJS_prod = target/lib/producer/producer_tts.o
+	OBJS_mutexbin = target/lib/my_mutex/mutex_tts.o
+
+endif
+
+OBJS_mutex = $(patsubst src/my_mutex/%.c, target/lib/my_mutex/%.o, $(SRC_mutex))
+
+all: $(TARGETS)
+	@echo "Built with custom mutexes and implementation: $(MUTEX)"
+
+$(BINS_DIR)/phil:  $(OBJS_phil) $(OBJS_mutex) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_phil) $(OBJS_mutex) $(LDFLAGS) -o $@
+
+$(BINS_DIR)/rw:  $(OBJS_rw) $(OBJS_mutex) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_rw) $(OBJS_mutex) $(LDFLAGS) -o $@
+
+$(BINS_DIR)/prod:  $(OBJS_prod) $(OBJS_mutex) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_prod) $(OBJS_mutex) $(LDFLAGS) -o $@
+
+$(BINS_DIR)/mutex: $(OBJS_mutexbin) $(OBJS_mutex) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_mutexbin) $(OBJS_mutex) $(LDFLAGS) -o $@
+
+target/lib/philosophers/%.o: $(SRC_phil) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+target/lib/readers-writers/%.o: $(SRC_rw) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+target/lib/producer/%.o: $(SRC_prod) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+target/lib/my_mutex/%.o: src/my_mutex/%.c | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJS_mutexbin): $(SRC_mutexbin) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BINS_DIR):
+	@mkdir -p $(BINS_DIR)
+
+$(LIB_DIRS):
+	@mkdir -p $@
+
+.PHONY = all

@@ -64,3 +64,4 @@ for program in program_types:
     plt.savefig(f'{program}_performance_custom.png')
 
 print("Graphs saved successfully.")
+

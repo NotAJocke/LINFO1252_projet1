@@ -2,13 +2,13 @@
 
 ## Compilation
 ```sh
-$ make # Compile avec le mutex_test_and_set test_and_test_and_set
-$ make MUTEX_IMPL="tts" # Pareil 
-$ make MUTEX_IMPL="ts" # Avec le mutex_test_and_set test_and_set
+$ make libc # compile tous les programmes avec les sémaphores/mutex de base
+$ make tts # pareil avec l'algorithme test_and_test_and_set
+$ make ts # pareil avec le mutex test_and_set
+$ make clean # entre les swap d'algo
 ```
 
 ## Run
 ```sh
-$ make run BIN=<"phil"|"rw"|"prod"|"mutex"> ARGS="xxxxx"
-$ ./target/bin/<phil|rw|prod|mutex_test_and_set> [args] # sinon
+$ ./target/bin/<rw|prod|phil|mutex> <args>
 ```

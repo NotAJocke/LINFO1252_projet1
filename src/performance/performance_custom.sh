@@ -3,6 +3,10 @@ TIMEFORMAT=%R
 
 THREAD_CONFIGS=(2 4 8 16 32)
 REPEATS=5
+<<<<<<< HEAD
+=======
+EXECUTABLE_DIR="./target/bin"
+>>>>>>> main
 PROGRAMS=("phil" "pro" "rw")
 
 for MUTEX_IMPL in "tts" "ts" "partie 1"; do
@@ -40,9 +44,9 @@ for MUTEX_IMPL in "tts" "ts" "partie 1"; do
         DURATION=""
 
         if [[ "$PROGRAM" == "phil" ]]; then
-          DURATION=$({ time make run BIN="$PROGRAM" ARGS="$THREADS $TYPE"  2>>/dev/null; } 2>&1)
+          DURATION=$({ time $EXECUTABLE_DIR/$PROGRAM $THREADS $TYPE 2>>/dev/null; } 2>&1)
         else
-          DURATION=$({ time make run BIN="$PROGRAM" ARGS="$NB_PRODUCERS $NB_CONSUMERS $TYPE" 2>>/dev/null; } 2>&1)
+          DURATION=$({ time $EXECUTABLE_DIR/$PROGRAM $NB_PRODUCERS $NB_CONSUMERS $TYPE 2>>/dev/null; } 2>&1)
         fi
 
         echo "$PROGRAM,$THREADS,$RUN,$DURATION" >>$OUTPUT_FILE

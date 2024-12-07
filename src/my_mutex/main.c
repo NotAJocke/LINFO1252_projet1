@@ -10,10 +10,10 @@ my_mutex_t mutex;
 void *fake_worker(void *arg) {
   int n_threads = *(int *)arg;
 
-  for (int i = 0; i < CRITICAL_SECTIONS/n_threads; i++) {
+  for (int i = 0; i < CRITICAL_SECTIONS / n_threads; i++) {
     lock(&mutex);
 
-    for (int i = 0; i < 10000; i++)
+    for (volatile int i = 0; i < 10000; i++)
       ;
 
     unlock(&mutex);
