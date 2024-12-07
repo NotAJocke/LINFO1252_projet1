@@ -25,8 +25,8 @@ SRC_mutex += src/my_mutex/semaphore.c
 OBJ_phil = $(patsubst src/philosophers/%.c, target/lib/philosophers/%.o, $(SRC_phil))
 OBJ_rw = $(patsubst src/reads-writes/%.c, target/lib/reads-writes/%.o, $(SRC_rw))
 OBJ_pro = $(patsubst src/producer/%.c, target/lib/producer/%.o, $(SRC_pro))
-OBJ_mutex = $(patsubst src/my_mutex/*.c, target/lib/my_mutex/%.o, $(SRC_mutex))
-OBJ_mutexbin = $(patsubst src/my_mutex/*.c, target/lib/my_mutex/%.o, $(SRC_mutexbin))
+OBJ_mutex = $(patsubst src/my_mutex/%.c, target/lib/my_mutex/%.o, $(SRC_mutex))
+OBJ_mutexbin = $(patsubst src/my_mutex/%.c, target/lib/my_mutex/%.o, $(SRC_mutexbin))
 
 # Target directories
 TARGET_DIR = target/bin
@@ -83,7 +83,7 @@ $(LIB_DIR)/producer:
 	@mkdir -p $(LIB_DIR)/producer
 
 $(LIB_DIR)/my_mutex:
-	@mkdir -p (LIB_DIR)/my_mutex
+	@mkdir -p $(LIB_DIR)/my_mutex
 
 # Clean up build artifacts
 clean:
