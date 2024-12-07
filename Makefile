@@ -4,10 +4,10 @@ libc:
 	make -f Makefile.libc
 
 ts:
-	make -f Makefile.mutexts
+	make -f Makefile.custom MUTEX=ts
 
 tts:
-	make -f Makefile.mutextts
+	make -f Makefile.custom MUTEX=tts
 
 compile_commands:
 	bear -- make

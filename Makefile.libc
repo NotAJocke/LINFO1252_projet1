@@ -4,26 +4,34 @@ CFLAGS=-Wall -Wextra -Werror -Iinclude -I/opt/homebrew/include
 LDFLAGS=-L/opt/homebrew/lib -lpthread
 
 # Binaries
-BINS = phil
+BINS = phil rw
 BINS_DIR = target/bin
 TARGETS = $(addprefix $(BINS_DIR)/, $(BINS))
 
 # Libs
 LIB_DIR = target/lib
-LIB_DIRS = $(LIB_DIR)/philosophers
+LIB_DIRS = $(LIB_DIR)/philosophers $(LIB_DIR)/readers-writers
 
 # Sources
 SRC_phil = src/philosophers/philosophers.c
+SRC_rw = src/reads-writes/readers-writers.c
 
 # Objects
 OBJS_phil = target/lib/philosophers/philosophers_libc.o
+OBJS_rw = target/lib/readers-writers/readers-writers_libc.o
 
 all: $(TARGETS)
 
 $(BINS_DIR)/phil:  $(OBJS_phil) | $(BINS_DIR)
-	$(CC) $(CFLAGS) $(OBJS_phil) -o $@
+	$(CC) $(CFLAGS) $(OBJS_phil) $(LDFLAGS) -o $@
+
+$(BINS_DIR)/rw:  $(OBJS_rw) | $(BINS_DIR)
+	$(CC) $(CFLAGS) $(OBJS_rw) $(LDFLAGS) -o $@
 
 target/lib/philosophers/%.o: $(SRC_phil) | $(LIB_DIRS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+target/lib/readers-writers/%.o: $(SRC_rw) | $(LIB_DIRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINS_DIR):

@@ -111,3 +111,21 @@ int run_readers_writers(int readers, int writers) {
 
   return 0;
 }
+
+int main(int argc, char **argv) {
+  if (argc < 2) {
+    printf("Usage: ./phil <READERS+WRITERS>\n");
+  }
+
+  char *raw = argv[1];
+  char *end;
+  int amount = strtol(raw, &end, 10);
+
+  if (*end != '\0') {
+    printf("Usage: ./phil <READERS+WRITERS>\n");
+  }
+
+  int readers = amount / 2;
+  int writers = amount / 2;
+  run_readers_writers(readers, writers);
+}
