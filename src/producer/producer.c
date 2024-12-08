@@ -15,15 +15,21 @@ int nbConsumeDone = 0;
 pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
+
 // Simulation
 void simulation(void) {
-  for (volatile int i = 0; i < 10000; i++)
+  for (volatile int i = 0; i < 10000; i++) // volatile sinon la partie est skip
     ;
 }
 
-// Insertion d'un élément dans le buffer -> Ma seg error est ici
-// (probablement que juste faire idx_buffer >= BUFFER_SIZE ne convient pas, mais
-// jsp quoi essayer d'autre)
+
+// Insertion d'un élément dans le buffer
+/**
+* pre:
+* - idx_buffer doit être inférieur à BUFFER_SIZE
+* post:
+* - Un élément est inséré dans le buffer, idx_buffer est incrémenté
+*/
 void insert_item(int item) {
   if (idx_buffer >= BUFFER_SIZE) {
     printf("Erreur : Segfault (Hors limite)\n");
@@ -33,6 +39,13 @@ void insert_item(int item) {
   idx_buffer++;
 }
 
+// Suppresion d'un élément dans le buffer
+/**
+* pre:
+* - idx_buffer doit être supérieur à 0
+* post:
+* - Un élément est retiré du buffer, idx_buffer est décrémenté
+*/
 int remove_item() {
   if (idx_buffer <= 0) {
     printf("Erreur : Segfault (Vide)\n");
@@ -43,6 +56,12 @@ int remove_item() {
 }
 
 // Fonction producteur
+/**
+* pre:
+* - nbProductionsDone < NB_PRODUCTIONS
+* post:
+* - Un élément est créé et mis dans le buffer
+*/
 void *producer(void *arg) {
   int id = *(int *)arg;
 
@@ -70,6 +89,12 @@ void *producer(void *arg) {
 }
 
 // Fonction consommateur
+/**
+* pre:
+* - nbConsumeDone < NB_PRODUCTIONS
+* post:
+* - Un élément est retiré du buffer et utilisé
+*/
 void *consumer() {
   while (1) {
     sem_wait(&full);
@@ -92,6 +117,13 @@ void *consumer() {
   return NULL;
 }
 
+// Fonction pour lancer le programme
+/**
+* pre:
+* - nbProducers >= 1 et nbConsumers >= 1
+* post:
+* - Les threads producteurs et consommateurs sont créés et exécutés correctement (fonctionne comme une fonction main)
+*/
 int run_producer(int nbProducers, int nbConsumers) {
   if (nbProducers < 1 || nbConsumers < 1) {
     printf("Erreur : au moins 1 producteur et 1 consommateur sont requis.\n");

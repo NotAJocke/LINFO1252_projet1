@@ -23,10 +23,6 @@ for PROGRAM in "${PROGRAMS[@]}"; do
   for THREADS in "${THREAD_CONFIGS[@]}"; do
     echo "  Test de $THREADS threads..."
 
-    # Diviser les threads en deux pour produce et reader-writers
-    NB_PRODUCERS=$((THREADS / 2))
-    NB_CONSUMERS=$((THREADS / 2))
-
     for RUN in $(seq 1 $REPEATS); do
       DURATION=""
 

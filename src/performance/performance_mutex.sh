@@ -23,8 +23,8 @@ for MUTEX_IMPL in "tts" "ts"; do
   make $MUTEX_IMPL
 
   # Tester chaque type 1 par 1 (il y en a qu'un pour l'instant)
+  #Useless pour l'instant mais tkt
   for PROGRAM in "${PROGRAMS[@]}"; do
-    #Useless pour l'instant mais tkt
     for THREADS in "${THREAD_CONFIGS[@]}"; do
       echo "  Test de $THREADS threads avec MUTEX_IMPL=$MUTEX_IMPL..."
 
