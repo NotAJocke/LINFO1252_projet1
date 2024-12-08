@@ -32,9 +32,6 @@ for MUTEX_IMPL in "tts" "ts" "libc"; do
     for THREADS in "${THREAD_CONFIGS[@]}"; do
       echo "  Test de $THREADS threads avec (MUTEX : $MUTEX_IMPL & PROGRAM : $PROGRAM)"
 
-      NB_PRODUCERS=$((THREADS / 2))
-      NB_CONSUMERS=$((THREADS / 2))
-
       for RUN in $(seq 1 $REPEATS); do
         DURATION=""
 

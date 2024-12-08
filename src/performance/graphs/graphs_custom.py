@@ -42,16 +42,21 @@ for program in program_types:
         mutex_data = program_data[program_data['Mutex'] == mutex]
         mean_values = mutex_data.set_index('Nombre de Threads')['mean_time'].reindex(thread_counts, fill_value=0)
         std_values = mutex_data.set_index('Nombre de Threads')['std_time'].reindex(thread_counts, fill_value=0)
-
+        if mutex == "p1": mutex = "POSIX"
+        if mutex == "tts": mutex = "Test and test and set"
+        if mutex == "ts": mutex = "Test and set"
         bar_positions = index + i * bar_width
         ax.bar(bar_positions, mean_values, bar_width,
                yerr=std_values, label=mutex,
                color=colors[i], alpha=0.3, capsize=5)
 
         ax.plot(bar_positions, mean_values, color=colors[i], marker='.', linestyle='dotted')
-
+    program_name = ""
+    if program == "phil": program_name = " le problème des philosophes"
+    if program == "prod": program_name = "le problème des producteurs-consommateurs"
+    if program == "rw": program_name = "le problème des lecteurs et écrivains"
     # Graph settings
-    ax.set_title(f'Performance pour {program}')
+    ax.set_title(f'Performance pour {program_name}')
     ax.set_xlabel('Nombre de Threads')
     ax.set_ylabel('Temps d\'execution (s)')
     ax.set_xticks(index + bar_width)

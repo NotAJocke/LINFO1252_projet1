@@ -39,9 +39,12 @@ for program in program_types:
 
     # Add points centered on the bars
     ax.plot(index, mean_values, color=color, marker='o', linestyle='dotted')
-
+    program_name = ""
+    if program == "phil": program_name = " le problème des philosophes"
+    if program == "prod": program_name = "le problème des producteurs-consommateurs"
+    if program == "rw": program_name = "le problème des lecteurs et écrivains"
     # Graph settings
-    ax.set_title(f'Performance de {program}')
+    ax.set_title(f'Performance pour {program_name}')
     ax.set_xlabel('Nombre de Threads')
     ax.set_ylabel('Temps d\'execution(s)')
     ax.set_xticks(index)

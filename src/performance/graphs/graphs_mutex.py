@@ -37,7 +37,7 @@ for i, program in enumerate(pivoted1.columns):
     mean_values1 = pivoted1[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
     std_values1 = std_pivoted1[program].fillna(0)
     ax.bar(index + i * bar_width, mean_values1, bar_width,
-           yerr=std_values1, label=f'{program} (tts)',
+           yerr=std_values1, label='Test and test and set',
            color=colors[i % len(colors)], capsize=5)
 
     ax.plot(index + i * bar_width, mean_values1, color=colors[i % len(colors)], marker='.', linestyle='dotted')
@@ -46,7 +46,7 @@ for i, program in enumerate(pivoted2.columns):
     mean_values2 = pivoted2[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
     std_values2 = std_pivoted2[program].fillna(0)
     ax.bar(index + (len(pivoted1.columns) + i) * bar_width, mean_values2, bar_width,
-           yerr=std_values2, label=f'{program} (ts)',
+           yerr=std_values2, label='Test and set',
            color=colors[(i + len(pivoted1.columns)) % len(colors)], capsize=5)
 
     ax.plot(index + (len(pivoted1.columns) + i) * bar_width, mean_values2, color=colors[(i + len(pivoted1.columns)) % len(colors)], marker='.', linestyle='dotted')
