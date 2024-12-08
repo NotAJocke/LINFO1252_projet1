@@ -3,57 +3,73 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-# CSV
-df1 = pd.read_csv(os.path.abspath('src/performance/performance_tts.csv'))
-df2 = pd.read_csv(os.path.abspath('src/performance/performance_ts.csv'))
+# Charger les données depuis les fichier CSV
+df_tts = pd.read_csv(os.path.abspath('src/performance/performance_tts_custom.csv'))
+df_ts = pd.read_csv(os.path.abspath('src/performance/performance_ts_custom.csv'))
+df_p1 = pd.read_csv(os.path.abspath('src/performance/performance_p1_custom.csv'))
 
-# infos avec tts
-grouped1 = df1.groupby(['Programme', 'Nombre de Threads']).agg(
-    mean_time=('Temps d\'execution', 'mean'),  # Average time
-    std_time=('Temps d\'execution', 'std')    # Standard deviation
+# Ajouter une colonne mutex avec le bon en fonction du fichier
+df_tts['Mutex'] = 'tts'
+df_ts['Mutex'] = 'ts'
+df_p1['Mutex'] = 'p1'
+df = pd.concat([df_tts, df_ts, df_p1])
+
+# Regrouper les données par programme et nombre de threads
+grouped = df.groupby(['Programme', 'Mutex', 'Nombre de Threads']).agg(
+    mean_time=('Temps d\'execution', 'mean'),
+    std_time=('Temps d\'execution', 'std')
 ).reset_index()
 
-# infos avec ts
-grouped2 = df2.groupby(['Programme', 'Nombre de Threads']).agg(
-    mean_time=('Temps d\'execution', 'mean'),  # Moyenne
-    std_time=('Temps d\'execution', 'std')    # Ecart type
-).reset_index()
+program_types = grouped['Programme'].unique()
+mutex_types = ['tts', 'ts', 'p1']
+colors = ['#87A878', '#CA3C25', '#A3A1D1']  # Colors for mutex types
 
-pivoted1 = grouped1.pivot(index='Nombre de Threads', columns='Programme', values='mean_time')
-std_pivoted1 = grouped1.pivot(index='Nombre de Threads', columns='Programme', values='std_time')
+# Créer un graphique pour chaque programme
+for program in program_types:
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-pivoted2 = grouped2.pivot(index='Nombre de Threads', columns='Programme', values='mean_time')
-std_pivoted2 = grouped2.pivot(index='Nombre de Threads', columns='Programme', values='std_time')
-thread_counts = pivoted1.index
+    # Filtrer les données pour le programme actuel
+    program_data = grouped[grouped['Programme'] == program]
+    thread_counts = sorted(program_data['Nombre de Threads'].unique())
+    index = np.arange(len(thread_counts))
+    bar_width = 0.2
 
-fig, ax = plt.subplots(figsize=(12, 6))
-bar_width = 0.1
-index = np.arange(len(thread_counts))
+    # Plot bars for each mutex type
+    for i, mutex in enumerate(mutex_types):
+        # Extraire les valeurs de grouped (ecart-type et moyenne)
+        mutex_data = program_data[program_data['Mutex'] == mutex]
+        mean_values = mutex_data.set_index('Nombre de Threads')['mean_time'].reindex(thread_counts, fill_value=0)
+        std_values = mutex_data.set_index('Nombre de Threads')['std_time'].reindex(thread_counts, fill_value=0)
 
-colors = ['#87A878', '#C7CCB9']  # VERT :3
+        # Changer le nom des infos dans la légende
+        if mutex == "p1": mutex = "POSIX"
+        if mutex == "tts": mutex = "Test and test and set"
+        if mutex == "ts": mutex = "Test and set"
 
-# tts & ts (fait de sorte à avoir les 3 autres programmes)
-for i, program in enumerate(pivoted1.columns):
-    mean_values1 = pivoted1[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
-    std_values1 = std_pivoted1[program].fillna(0)
-    ax.bar(index + i * bar_width, mean_values1, bar_width,
-           yerr=std_values1, label=f'{program} (tts)',
-           color=colors[i % len(colors)], capsize=5)
+        # Dessiner les barres avec l'ecart type (en noir)
+        bar_positions = index + i * bar_width
+        ax.bar(bar_positions, mean_values, bar_width,
+               yerr=std_values, label=mutex,
+               color=colors[i], alpha=0.3, capsize=5)
+        # Ajouter les points pour visualiser les moyennes
+        ax.plot(bar_positions, mean_values, color=colors[i], marker='.', linestyle='dotted')
+    program_name = ""
+    if program == "phil": program_name = " le problème des philosophes"
+    if program == "prod": program_name = "le problème des producteurs-consommateurs"
+    if program == "rw": program_name = "le problème des lecteurs et écrivains"
 
-for i, program in enumerate(pivoted2.columns):
-    mean_values2 = pivoted2[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
-    std_values2 = std_pivoted2[program].fillna(0)
-    ax.bar(index + (len(pivoted1.columns) + i) * bar_width, mean_values2, bar_width,
-           yerr=std_values2, label=f'{program} (ts)',
-           color=colors[(i + len(pivoted1.columns)) % len(colors)], capsize=5)
+    # Parametres
+    ax.set_title(f'Performance pour {program_name}')
+    ax.set_xlabel('Nombre de Threads')
+    ax.set_ylabel('Temps d\'execution (s)')
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(thread_counts)
+    ax.legend(title='Type de mutex')
+    ax.grid(axis='y', linestyle='-', alpha=0.7)
 
-# Graph
-ax.set_xlabel('Nombre de Threads') # Label du X
-ax.set_ylabel('Temps d\'exécution (s)') # Label du Y
-ax.set_title('Comparaison des temps d\'exécution moyen par mutex et nombre de threads')
-ax.set_xticks(index + bar_width * (len(pivoted1.columns) - 1) / 2)
-ax.set_xticklabels(thread_counts) # Bons nombre de thread afficher
-ax.set_ylim(0, max(pivoted1.max().max(), pivoted2.max().max()) + 0.5)
-ax.legend()
-plt.tight_layout()
-plt.savefig('custom.png')
+    # Sauver en PNG
+    plt.tight_layout()
+    plt.savefig(f'img/{program}_performance_custom.png')
+
+print("Graphs saved successfully.")
+

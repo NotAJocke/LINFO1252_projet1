@@ -3,40 +3,55 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+# Charger les données depuis le fichier CSV
 df = pd.read_csv(os.path.abspath('src/performance/performance.csv'))
 
-# Fusionner les valeurs pour pas avoir 5x5x3 mais juste 5x3.
+# Regrouper les données par programme et nombre de threads
 grouped = df.groupby(['Programme', 'Nombre de Threads']).agg(
-    mean_time=('Temps d\'execution', 'mean'), # Moyenne.
-    std_time=('Temps d\'execution', 'std') # Ecart-type.
+    mean_time=('Temps d\'execution', 'mean'), # Calcul de la moyenne
+    std_time=('Temps d\'execution', 'std') # Calcul de l'ecart type
 ).reset_index()
 
-# NBR Thread et programmes (pour éviter que l'un ait pas et que rien ne marche).
-pivoted = grouped.pivot(index='Nombre de Threads', columns='Programme', values='mean_time')
-std_pivoted = grouped.pivot(index='Nombre de Threads', columns='Programme', values='std_time')
-thread_counts = pivoted.index
-programs = pivoted.columns
+program_types = grouped['Programme'].unique()
+color = '#A3A1D1'
 
-fig, ax = plt.subplots(figsize=(10, 6))
-bar_width = 0.1
-index = np.arange(len(thread_counts))
+# Créer un graphique pour chaque programme
+for program in program_types:
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-colors = ['#87A878', '#C7CCB9', '#DBF9B8'] # LE VERT <3
+    # Filtrer les données pour le programme actuel
+    program_data = grouped[grouped['Programme'] == program]
+    thread_counts = sorted(program_data['Nombre de Threads'].unique())
+    index = np.arange(len(thread_counts))
 
-for i, program in enumerate(programs):
-    mean_values = pivoted[program].fillna(0) # .fillna() -> empêcher d'avoir une erreur si pas de valeur
-    std_values = std_pivoted[program].fillna(0)
-    ax.bar(index + i * bar_width, mean_values, bar_width,
+    # Extraire les valeurs de grouped (ecart-type et moyenne)
+    mean_values = program_data.set_index('Nombre de Threads')['mean_time'].reindex(thread_counts, fill_value=0)
+    std_values = program_data.set_index('Nombre de Threads')['std_time'].reindex(thread_counts, fill_value=0)
+
+    # Dessiner les barres avec l'ecart type (en noir)
+    bar_width = 0.4
+    ax.bar(index, mean_values, bar_width,
            yerr=std_values, label=program,
-           color=colors[i % len(colors)], capsize=5) # Dessiner le graph
+           color=color, alpha=0.7, capsize=5)
 
-# Graph
-ax.set_xlabel('Nombre de Threads') # Label du X
-ax.set_ylabel('Temps d\'exécution (s)') # Label du Y
-ax.set_title('Temps d\'exécution moyen par programme et nombre de threads') # Titre du graph
-ax.set_xticks(index + bar_width * (len(programs) - 1) / 2)
-ax.set_xticklabels(thread_counts) # Bons nombre de thread afficher
-ax.set_ylim(0, pivoted.max().max() + 0.5) # Changer taille max du Y
-ax.legend()
-plt.tight_layout() # Plus joli
-plt.show()
+    # Ajouter les points pour visualiser les moyennes
+    ax.plot(index, mean_values, color=color, marker='o', linestyle='dotted')
+    program_name = ""
+    if program == "phil": program_name = " le problème des philosophes"
+    if program == "prod": program_name = "le problème des producteurs-consommateurs"
+    if program == "rw": program_name = "le problème des lecteurs et écrivains"
+
+    # Parametres
+    ax.set_title(f'Performance pour {program_name}')
+    ax.set_xlabel('Nombre de Threads')
+    ax.set_ylabel('Temps d\'execution(s)')
+    ax.set_xticks(index)
+    ax.set_xticklabels(thread_counts)
+    ax.grid(axis='y', linestyle='-', alpha=0.7)
+
+    # Sauver en PNG
+    plt.tight_layout()
+    plt.savefig(f'img/{program}_performance.png')
+    plt.close()
+
+print("Graphs saved successfully.")

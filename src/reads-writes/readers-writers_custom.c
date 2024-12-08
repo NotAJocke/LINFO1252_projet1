@@ -110,8 +110,6 @@ int run_readers_writers(int readers, int writers) {
 }
 
 int main(int argc, char **argv) {
-  printf("Running the custom one\n");
-
   if (argc < 2) {
     printf("Usage: ./phil <READERS+WRITERS>\n");
   }
